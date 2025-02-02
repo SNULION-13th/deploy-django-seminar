@@ -1,5 +1,5 @@
 """
-ASGI config for deploy_mutsha_12th project.
+ASGI config for deploy_mutsha_13th project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'deploy_mutsha_12th.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'deploy_mutsha_13th.settings')
 
 application = get_asgi_application()
