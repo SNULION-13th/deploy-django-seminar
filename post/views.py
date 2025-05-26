@@ -55,6 +55,8 @@ class PostListView(APIView):
     )
     def post(self, request):
         if not request.user.is_authenticated:
+            print(request.user)
+            print(request.user.is_authenticated)
             return Response(
                 {"detail": "please signin"}, status=status.HTTP_401_UNAUTHORIZED
             )
