@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 
 from account.request_serializers import SignInRequestSerializer
 from comment.request_serializers import (
-    ComentDetailRequestSerializer,
-    ComentListRequestSerializer,
+    CommentDetailRequestSerializer,
+    CommentListRequestSerializer,
 )
 from post.models import Post, User
 
@@ -51,7 +51,7 @@ class CommentListView(APIView):
     @swagger_auto_schema(
         operation_id="댓글 생성",
         operation_description="특정 게시글에 댓글을 생성합니다.",
-        request_body=ComentListRequestSerializer,
+        request_body=CommentListRequestSerializer,
         responses={
             201: CommentSerializer,
             400: "Bad Request",
@@ -92,7 +92,7 @@ class CommentDetailView(APIView):
     @swagger_auto_schema(
         operation_id="댓글 수정",
         operation_description="특정 댓글을 수정합니다.",
-        request_body=ComentDetailRequestSerializer,
+        request_body=CommentDetailRequestSerializer,
         responses={
             200: CommentSerializer,
             400: "Bad Request",
