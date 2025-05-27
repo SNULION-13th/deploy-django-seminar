@@ -12,14 +12,9 @@ from account.request_serializers import (
 from .serializers import (
     UserSerializer,
     UserProfileSerializer,
-)
-from .models import UserProfile
-## 추가
-from .serializers import (
-    UserSerializer,
-    UserProfileSerializer,
     UserIdUsernameSerializer,
 )
+from .models import UserProfile
 
 def generate_token_in_serialized_data(user, user_profile):
     token = RefreshToken.for_user(user)
@@ -27,7 +22,6 @@ def generate_token_in_serialized_data(user, user_profile):
     serialized_data = UserProfileSerializer(user_profile).data
     serialized_data["token"] = {"access": access_token, "refresh": refresh_token}
     return serialized_data
-
 
 def set_token_on_response_cookie(user, status_code) -> Response:
     token = RefreshToken.for_user(user)
