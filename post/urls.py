@@ -4,7 +4,7 @@ from .views import PostListView, PostDetailView, LikeView
 
 app_name = 'post'
 urlpatterns = [
-    # FBV url path
+    # FBV url path,s
     # path("register_post/", CreatePostView),
     # path("see_post/", ReadAllPostView),
 

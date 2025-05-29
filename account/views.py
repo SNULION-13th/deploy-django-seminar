@@ -4,19 +4,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from account.request_serializers import (
     SignInRequestSerializer,
     SignUpRequestSerializer,
     TokenRefreshRequestSerializer,
 )
-
 from .serializers import (
     UserSerializer,
     UserProfileSerializer,
+    UserIdUsernameSerializer,
 )
 from .models import UserProfile
-
 
 def generate_token_in_serialized_data(user, user_profile):
     token = RefreshToken.for_user(user)
@@ -25,16 +23,30 @@ def generate_token_in_serialized_data(user, user_profile):
     serialized_data["token"] = {"access": access_token, "refresh": refresh_token}
     return serialized_data
 
-
 def set_token_on_response_cookie(user, status_code) -> Response:
     token = RefreshToken.for_user(user)
     user_profile = UserProfile.objects.get(user=user)
     serialized_data = UserProfileSerializer(user_profile).data
     res = Response(serialized_data, status=status_code)
-    res.set_cookie("refresh_token", value=str(token), httponly=True)
-    res.set_cookie("access_token", value=str(token.access_token), httponly=True)
+    res.set_cookie("refresh_token", value=str(token))
+    res.set_cookie("access_token", value=str(token.access_token))
     return res
 
+class UserInfoView(APIView):
+    @swagger_auto_schema(
+        operation_id="사용자 정보 조회",
+        operation_description="현재 로그인한 사용자의 정보를 조회합니다.",
+        responses={
+            200: UserIdUsernameSerializer,
+            401: 'Unauthorized'
+        }
+    )
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "로그인 후 다시 시도해주세요."}, status=status.HTTP_401_UNAUTHORIZED)
+        user = request.user
+        serializer = UserIdUsernameSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class SignUpView(APIView):
     @swagger_auto_schema(
@@ -105,7 +117,7 @@ class TokenRefreshView(APIView):
             )
         new_access_token = str(RefreshToken(refresh_token).access_token)
         response = Response({"detail": "token refreshed"}, status=status.HTTP_200_OK)
-        response.set_cookie("access_token", value=str(new_access_token), httponly=True)
+        response.set_cookie("access_token", value=str(new_access_token))
         return response
 
 
