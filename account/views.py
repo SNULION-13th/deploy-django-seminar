@@ -32,8 +32,8 @@ def set_token_on_response_cookie(user, status_code) -> Response:
     user_profile = UserProfile.objects.get(user=user)
     serialized_data = UserProfileSerializer(user_profile).data
     res = Response(serialized_data, status=status_code)
-    res.set_cookie("refresh_token", value=str(token))
-    res.set_cookie("access_token", value=str(token.access_token))
+    res.set_cookie("refresh_token", value=str(token), httponly=True, samesite='Strict')
+    res.set_cookie("access_token", value=str(token.access_token), httponly=True, samesite='Strict')    
     return res
 
 
@@ -123,14 +123,21 @@ class SignOutView(APIView):
                 {"detail": "please signin"}, status=status.HTTP_401_UNAUTHORIZED
             )
 
-        refresh_token = request.data.get("refresh")
+        refresh_token = request.COOKIES.get("refresh")
         if not refresh_token:
             return Response(
                 {"detail": "no refresh token"}, status=status.HTTP_400_BAD_REQUEST
             )
-        RefreshToken(refresh_token).blacklist()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            RefreshToken(refresh_token).blacklist()
+        except Exception:
+            pass
+        res = Response(status=status.HTTP_204_NO_CONTENT)
+        res.delete_cookie("access_token")
+        res.delete_cookie("refresh_token")
+        return res
+    
+    
 class UserInfoView(APIView):
     @swagger_auto_schema(
         operation_id="사용자 정보 조회",
